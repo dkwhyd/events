@@ -1,4 +1,6 @@
+import 'package:events/screens/launch_screen.dart';
 import 'package:events/shared/authentication.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -9,7 +11,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isLogin = true;
+  bool? _isLogin = false;
   String? _userId;
   String? _password;
   String? _email;
@@ -19,12 +21,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController txtPassword = TextEditingController();
 
   Authentication auth = Authentication();
-  String email = 'test@serenitylink.live';
-  String password = 'test1234';
-
   @override
   void initState() {
-    // auth.login(email, password).then((value) => value);
+    auth.getUser().then((user) => {
+          if (user == null) {_isLogin = false} else {_isLogin = true}
+        });
     super.initState();
   }
 
@@ -32,19 +33,19 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Container(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: SingleChildScrollView(
           child: Form(
               child: Column(
             children: [
               emailInput(),
               passwordInput(),
+              validationMessage(),
               mainButton(),
               secondaryButton(),
-              validationMessage(),
             ],
           )),
         ),
@@ -54,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget emailInput() {
     return Padding(
-      padding: EdgeInsets.only(top: 120),
+      padding: const EdgeInsets.only(top: 120),
       child: TextFormField(
         controller: txtEmail,
         onChanged: (text) {
@@ -63,7 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
           });
         },
         keyboardType: TextInputType.emailAddress,
-        decoration: InputDecoration(hintText: 'Email', icon: Icon(Icons.mail)),
+        decoration:
+            const InputDecoration(hintText: 'Email', icon: Icon(Icons.mail)),
         validator: (text) => text!.isEmpty ? 'Email is required' : '',
       ),
     );
@@ -71,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget passwordInput() {
     return Padding(
-        padding: EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 10),
         child: TextFormField(
           controller: txtPassword,
           onChanged: (text) {
@@ -80,38 +82,38 @@ class _LoginScreenState extends State<LoginScreen> {
             });
           },
           keyboardType: TextInputType.emailAddress,
-          
           obscureText: true,
-          decoration: InputDecoration(
-              hintText: 'Password', icon: Icon(Icons.enhanced_encryption)),
+          decoration: const InputDecoration(
+              hintText: 'Password', icon: Icon(Icons.lock)),
           validator: (text) => text!.isEmpty ? 'Password is required' : '',
         ));
   }
 
   Widget mainButton() {
-    String buttonText = _isLogin ? 'Login' : 'Sign up';
+    String buttonText = _isLogin! ? 'Sign up' : 'Login';
     return Padding(
-        padding: EdgeInsets.only(top: 40),
-        child: Container(
+        padding: const EdgeInsets.only(top: 40),
+        child: SizedBox(
             height: 50,
             width: MediaQuery.of(context).size.width - 10,
             child: ElevatedButton(
               child: Text(buttonText),
               onPressed: () async {
-                auth
-                    .login(_email!, _password!)
-                    .then((value) => print('uid: $value'));
+                submit();
               },
             )));
   }
 
   Widget secondaryButton() {
-    String buttonText = !_isLogin ? 'Login' : 'Sign up';
+    String buttonText = !_isLogin! ? 'Login' : 'Sign up';
     return ElevatedButton(
       child: Text(buttonText),
-      onPressed: () {
+      onPressed: () async {
+        await auth.signUp(_email!, _password!).then((value) => setState(() {
+              _message = value;
+            }));
         setState(() {
-          _isLogin = !_isLogin;
+          _isLogin = !_isLogin!;
         });
       },
     );
@@ -120,8 +122,43 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget validationMessage() {
     return Text(
       _message ?? '',
-      style: TextStyle(
+      style: const TextStyle(
           fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold),
     );
+  }
+
+  Future submit() async {
+    try {
+      if (_email == null || _password == null) {
+        setState(() {
+          _message = 'Email or Password empty';
+        });
+      } else {
+        setState(() {
+          _message = '';
+        });
+        await auth.login(_email!, _password!).then((value) => {
+              _userId = value,
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Login success'),
+                duration: Duration(milliseconds: 2000),
+              ))
+            });
+
+        if (_userId != null) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LaunchScreen()),
+            (Route<dynamic> route) => false,
+          );
+        }
+      }
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        setState(() {
+          _message = e.message;
+        });
+      }
+    }
   }
 }
