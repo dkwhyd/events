@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// ignore: unused_import
 import 'package:events/models/even_detail.dart';
 import 'package:flutter/material.dart';
 
@@ -10,9 +9,15 @@ class EventScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Event'),
+        backgroundColor: Colors.purple,
+        title: const Center(
+          child: Text(
+            'Events',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       ),
-      body: EventList(),
+      body: const EventList(),
     );
   }
 }
@@ -45,10 +50,10 @@ class _EventListState extends State<EventList> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        itemCount: details != null ? details.length : 0,
+        itemCount: details.length,
         itemBuilder: (context, position) {
           String sub =
-              "Date: ${details[position].date} - Start: ${details[position].startTime}- End: ${details[position].endTime}";
+              "Date: ${details[position].date} - Start: ${details[position].startTime} - End: ${details[position].endTime}";
           return ListTile(
             title: Text(details[position].description),
             subtitle: Text(sub),
@@ -62,11 +67,11 @@ class _EventListState extends State<EventList> {
     details = data.docs.map((e) => EventDetail.fromMap(e)).toList();
 
     int i = 0;
-    details.forEach((detail) {
+    // print("Total data: ${details.length}");
+    for (var detail in details) {
       detail.id = data.docs[i].id;
-      print(detail.id);
       i++;
-    });
+    }
     return details;
   }
 }
