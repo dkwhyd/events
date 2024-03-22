@@ -28,8 +28,10 @@ class EventScreen extends StatelessWidget {
             color: Colors.white,
             onPressed: () {
               auth.signOut().then((result) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()));
               });
             },
           ),
@@ -53,13 +55,11 @@ class _EventListState extends State<EventList> {
 
   @override
   void initState() {
-    if (mounted) {
-      getDetailList().then((data) {
-        setState(() {
-          details = data;
-        });
+    getDetailList().then((data) {
+      setState(() {
+        details = data;
       });
-    }
+    });
 
     getDetailList();
     super.initState();
