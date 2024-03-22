@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/models/even_detail.dart';
+import 'package:events/screens/login_screens.dart';
+import 'package:events/shared/authentication.dart';
 import 'package:flutter/material.dart';
 
 class EventScreen extends StatelessWidget {
@@ -7,6 +9,7 @@ class EventScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Authentication auth = Authentication();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purple,
@@ -16,6 +19,21 @@ class EventScreen extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.exit_to_app,
+              semanticLabel: 'Logout',
+            ),
+            color: Colors.white,
+            onPressed: () {
+              auth.signOut().then((result) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()));
+              });
+            },
+          ),
+        ],
       ),
       body: const EventList(),
     );
