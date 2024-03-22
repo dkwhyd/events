@@ -5,7 +5,7 @@ class EventDetail {
   String? _startTime;
   String? _endTime;
   String? _speaker;
-  String? _isFavorite;
+  bool? _isFavorite;
 
   EventDetail(this.id, this._description, this._date, this._startTime,
       this._endTime, this._speaker, this._isFavorite);
@@ -15,10 +15,10 @@ class EventDetail {
   String? get startTime => _startTime;
   String? get endTime => _endTime;
   String? get speaker => _speaker;
-  String? get isFavorite => _isFavorite;
+  bool? get isFavorite => _isFavorite;
 
   EventDetail.fromMap(object) {
-    id = object['id'];
+    id = object.id;
     _description = object['description'];
     _date = object['date'];
     _startTime = object['start_time'];
@@ -28,7 +28,7 @@ class EventDetail {
   }
 
   toMap() {
-    var map = Map<String, dynamic>();
+    var map = <String, dynamic>{};
     if (id != null) {
       map['id'] = id;
     }
@@ -39,6 +39,4 @@ class EventDetail {
     map['speaker'] = _speaker;
     return map;
   }
-
-  toList() {}
 }
