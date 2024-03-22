@@ -52,7 +52,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
     return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(
-          color: Colors.blue,
+          color: Colors.purple,
         ),
       ),
     );
