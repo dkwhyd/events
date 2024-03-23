@@ -2,10 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/models/even_detail.dart';
 import 'package:events/screens/login_screens.dart';
 import 'package:events/shared/authentication.dart';
+import 'package:events/shared/firestore_helper.dart';
 import 'package:flutter/material.dart';
 
 class EventScreen extends StatelessWidget {
-  const EventScreen({super.key});
+  final String uid;
+  const EventScreen({
+    required this.uid,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +32,53 @@ class EventScreen extends StatelessWidget {
             ),
             color: Colors.white,
             onPressed: () {
-              auth.signOut().then((result) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LoginScreen()));
-              });
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Confirm Logout'),
+                    content: const Text('Are you sure you want to log out?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Tutup dialog
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          auth.signOut().then((result) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()),
+                              (Route<dynamic> route) => false,
+                            );
+                          });
+                        },
+                        child: const Text('Logout'),
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
         ],
       ),
-      body: const EventList(),
+      body: EventList(
+        uid: uid,
+      ),
     );
   }
 }
 
 class EventList extends StatefulWidget {
-  const EventList({super.key});
+  final String? uid;
+  const EventList({
+    required this.uid,
+    super.key,
+  });
 
   @override
   State<EventList> createState() => _EventListState();
@@ -75,6 +110,12 @@ class _EventListState extends State<EventList> {
           return ListTile(
             title: Text(details[position].description),
             subtitle: Text(sub),
+            trailing: IconButton(
+              icon: const Icon(Icons.favorite),
+              onPressed: () {
+                toggleFavorite(details[position]);
+              },
+            ),
           );
         });
   }
@@ -91,5 +132,9 @@ class _EventListState extends State<EventList> {
       i++;
     }
     return details;
+  }
+
+  void toggleFavorite(EventDetail ed) {
+    FireStoreHelper.addFavorite(ed, widget.uid.toString());
   }
 }
