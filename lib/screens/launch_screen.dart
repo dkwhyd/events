@@ -20,7 +20,10 @@ class _LaunchScreenState extends State<LaunchScreen> {
       if (user != null) {
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const EventScreen()),
+            MaterialPageRoute(
+                builder: (context) => EventScreen(
+                      uid: user.uid,
+                    )),
             (Route route) => false);
       } else {
         Navigator.push(
@@ -36,9 +39,13 @@ class _LaunchScreenState extends State<LaunchScreen> {
   Widget build(BuildContext context) {
     auth.getUser().then((user) {
       if (user != null) {
+        print(user.uid);
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const EventScreen()),
+          MaterialPageRoute(
+              builder: (context) => EventScreen(
+                    uid: user.uid,
+                  )),
           (Route route) => false,
         );
       } else {
