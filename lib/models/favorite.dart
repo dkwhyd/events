@@ -1,20 +1,24 @@
 class Favorite {
-  String? _id;
+  String? id;
   String? _eventId;
   String? _userId;
-  Favorite(this._id, this._eventId, this._userId);
+
+  Favorite(this.id, this._eventId, this._userId);
 
   Favorite.map(snapshot) {
     Map<String, dynamic> data = snapshot.data()!;
-    _id = snapshot.id;
+    id = snapshot.id;
     _eventId = data['eventId'];
     _userId = data['userId'];
   }
+
   String? get eventId => _eventId;
-  toMap() {
-    Map map = <String, dynamic>{};
-    if (_id != null) {
-      map['id'] = _id;
+  String? get userId => _userId; // Setter for 'id'
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = <String, dynamic>{};
+    if (id != null) {
+      map['id'] = id;
     }
     map['eventId'] = _eventId;
     map['userId'] = _userId;

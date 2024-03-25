@@ -32,9 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
       body: Container(
         padding: const EdgeInsets.all(24),
         child: SingleChildScrollView(
@@ -45,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
               passwordInput(),
               validationMessage(),
               mainButton(),
+              Text('or'),
               secondaryButton(),
             ],
           )),
@@ -106,16 +104,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget secondaryButton() {
     String buttonText = !_isLogin! ? 'Login' : 'Sign up';
-    return ElevatedButton(
-      child: Text(buttonText),
-      onPressed: () async {
-        await auth.signUp(_email!, _password!).then((value) => setState(() {
-              _message = value;
-            }));
-        setState(() {
-          _isLogin = !_isLogin!;
-        });
-      },
+    return SizedBox(
+      height: 50,
+      width: MediaQuery.of(context).size.width - 10,
+      child: ElevatedButton(
+        child: Text('Sign Up'),
+        onPressed: () async {
+          register();
+        },
+      ),
     );
   }
 
@@ -147,11 +144,39 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (_userId != null) {
           Navigator.pushAndRemoveUntil(
+            // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(builder: (context) => const LaunchScreen()),
             (Route<dynamic> route) => false,
           );
         }
+      }
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        setState(() {
+          _message = e.message;
+        });
+      }
+    }
+  }
+
+  Future register() async {
+    print('reg');
+
+    try {
+      if (_email == null || _password == null) {
+        setState(() {
+          _message = 'Email or Password empty';
+        });
+      } else {
+        setState(() {
+          _message = '';
+        });
+        await auth.signUp(_email!, _password!).then((value) => setState(() {
+              _message = 'Register account successfully';
+              _message = '';
+              _password = '';
+            }));
       }
     } catch (e) {
       if (e is FirebaseAuthException) {
