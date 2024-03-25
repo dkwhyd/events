@@ -39,7 +39,6 @@ class _LaunchScreenState extends State<LaunchScreen> {
   Widget build(BuildContext context) {
     auth.getUser().then((user) {
       if (user != null) {
-        print(user.uid);
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
