@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
               passwordInput(),
               validationMessage(),
               mainButton(),
-              Text('or'),
+              const Text('or'),
               secondaryButton(),
             ],
           )),
@@ -103,12 +103,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget secondaryButton() {
-    String buttonText = !_isLogin! ? 'Login' : 'Sign up';
     return SizedBox(
       height: 50,
       width: MediaQuery.of(context).size.width - 10,
       child: ElevatedButton(
-        child: Text('Sign Up'),
+        child: const Text('Sign Up'),
         onPressed: () async {
           register();
         },
@@ -161,8 +160,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future register() async {
-    print('reg');
-
     try {
       if (_email == null || _password == null) {
         setState(() {
