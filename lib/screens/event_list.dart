@@ -88,21 +88,22 @@ class _EventListState extends State<EventList> {
   }
 
   void toggleFavorite(EventDetail detail, position) {
-    Iterable<Favorite> data =
-        favorites.where((item) => item.eventId == detail.id).cast<Favorite>();
+    Iterable data =
+        favorites.where((item) => item.eventId == detail.id);
 
-    String idList = data.map((item) => item.id).join(', ');
+    String idList = data.map((item) => item.id!).join(', ');
 
     String itemId = detail.id!;
+    Future<void> toggleAction;
     if (isUserFavorite(itemId)) {
-      FireStoreHelper.deleteFavorite(idList).then((_) {
-        _loadFavorites();
-      });
+      toggleAction = FireStoreHelper.deleteFavorite(idList);
     } else {
-      FireStoreHelper.addFavorite(detail, widget.uid!).then((_) {
-        _loadFavorites();
-      });
+      toggleAction = FireStoreHelper.addFavorite(detail, widget.uid!);
     }
+
+    toggleAction.then((_) {
+      _loadFavorites();
+    });
   }
 
   bool isUserFavorite(String eventId) {
