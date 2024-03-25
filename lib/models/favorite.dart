@@ -13,7 +13,7 @@ class Favorite {
   }
 
   String? get eventId => _eventId;
-  String? get userId => _userId; // Setter for 'id'
+  String? get userId => _userId; 
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = <String, dynamic>{};
